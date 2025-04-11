@@ -11,8 +11,9 @@ NOT_FOUND = 404
 TOO_MANY_REQUESTS = 429
 CONNECTION_RESET = 104
 
-MAX_THREADS = 8
+MAX_THREADS = 1
 THROTTLE_TIME = MAX_THREADS * 4
+#THROTTLE_TIME = 10
 
 IMG_EXTS = [ 'jpg', 'jpeg', 'png', 'gif', 'webp' ]
 VID_EXTS = [ 'mp4', 'm4v', 'mkv', 'mov', 'wmv', 'webm', 'avi', 'flv', 'mp3' ]
@@ -183,8 +184,10 @@ def download_urls(dir, urls, algo=hashlib.md5, hashes={}):
             hashes[hash] = name
             stdout.write(f'Downloading as {hash}.{ext}\n')
             stdout.flush()
-            with open(join(dir, f'{hash}.{ext}'), 'wb') as file_out:
+            file_out_path = join(dir, f'{hash}.{ext}')
+            with open(file_out_path, 'wb') as file_out:
                 file_out.write(media)
+            #os.setxattr( file_out_path, 'dpd.origin.url', url )
         else:
             stdout.write(f'Duplicate media of {hashes[hash]}\n')
     return hashes
@@ -265,7 +268,7 @@ def multithread_download_urls_special(Dtsc, urls, pics_dst, vids_dst, algo=hashl
             
         # Update the number of status messages that were printed and sleep
         prevThreadCnt = len(download_threads)
-        time.sleep(1)
+        time.sleep(3)
         
     # Wait for the final threads to complete
     remaining = list(filter(lambda t: isinstance(t, Dtsc), enumerate()))
